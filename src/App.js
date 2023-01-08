@@ -1,14 +1,17 @@
 import React, {useState} from 'react'
 import PostItem from "./components/PostItem";
+import PostList from "./components/PostList";
 
 function App() {
-    const [post]
+    const [post, setPost] = useState([
+        {id: 1, title: 'JavaScript', body: 'Description'},
+        {id: 2, title: 'JavaScript 2', body: 'Description'},
+        {id: 3, title: 'JavaScript 3', body: 'Description'}
+    ])
 
     return (
         <div className="App">
-            <PostItem post={{id: 1, title: 'JavaScript', body: 'Description'}}/>
-            <PostItem post={{id: 2, title: 'JavaScript', body: 'Description'}}/>
-            <PostItem post={{id: 3, title: 'JavaScript', body: 'Description'}}/>
+            <PostList post={post} title={'Список постов'}/>
         </div>
     );
 }
