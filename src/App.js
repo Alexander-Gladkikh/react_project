@@ -6,21 +6,25 @@ import MyInput from "./components/UI/input/MyInput";
 import PostForm from "./components/UI/PostForm";
 
 function App() {
-    const [posts, setPosts] = useState([{id: 1, title: 'JavaScript', body: 'Description'}, {
-        id: 2,
-        title: 'JavaScript 2',
-        body: 'Description'
-    }, {id: 3, title: 'JavaScript 3', body: 'Description'}])
+    const [posts, setPosts] = useState([
+        {id: 1, title: 'JavaScript', body: 'Description'},
+        {id: 2, title: 'JavaScript 2', body: 'Description'},
+        {id: 3, title: 'JavaScript 3', body: 'Description'}
+    ])
 
     const create = (newPost) => {
         setPosts([...posts, newPost])
     }
 
+    const removePost = (post) => {
+        setPosts(posts.filter(el => el.id !== post.id))
+    }
+
 
     return (<div className="App">
-            <PostForm create={create}/>
-            <PostList post={posts} title={'Список постов'}/>
-        </div>);
+        <PostForm create={create}/>
+        <PostList removePost={removePost} post={posts} title={'Список постов'}/>
+    </div>);
 }
 
 export default App;
