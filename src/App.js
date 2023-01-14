@@ -9,26 +9,30 @@ import MyButton from "./components/UI/button/MyButton";
 import {usePosts} from "./hooks/usePosts";
 import axios from "axios";
 import PostService from "./API/PostService";
+import Loader from "./components/UI/Loader/Loader";
+import {useFetching} from "./hooks/useFetching";
+
 
 function App() {
     const [posts, setPosts] = useState([])
 
     const [filter, setFilter] = useState({sort: '', query: ''})
     const [visible, setVisible] = useState(false)
+    const [totalCount, setTotalCount] = useState(0)
+    const [limit, setLimit] = useState(10)
+    const [page, setPage] = useState(1)
     const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
-    const [isPostLoading, setIsPostLoading] = useState(false)
+    const [fetchPost, isPostLoading, postsError] = useFetching(async () => {
+        const response = await PostService.getAll(limit, page)
+        setPosts(response.data)
+        console.log(response.headers['x-total-count'])
+        setTotalCount(response.headers['x-total-count'])
+    })
 
     useEffect(() => {
         fetchPost()
     },[])
 
-
-    async function fetchPost() {
-        setIsPostLoading(true)
-        const posts = await PostService.getAll()
-        setPosts(posts)
-        setIsPostLoading(false)
-    }
 
     const create = (newPost) => {
         setPosts([...posts, newPost])
@@ -52,8 +56,10 @@ function App() {
 
             <hr style={{margin: '15px 0'}}/>
             <PostFilter filter={filter} setFilter={setFilter}/>
+            {postsError &&
+            <h1>Произшла ошибка ${postsError}</h1>}
             {isPostLoading
-            ? <h1>Идет загрузка....</h1>
+            ? <div style={{display:'flex', marginTop: '20px', justifyContent: 'center'}}><Loader/></div>
             : <PostList removePost={removePost} post={sortedAndSearchedPosts} title={'Список постов'}/>}
 
 
