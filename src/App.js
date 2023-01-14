@@ -1,4 +1,4 @@
-import React, {useMemo, useRef, useState} from 'react'
+import React, {useEffect, useMemo, useRef, useState} from 'react'
 import PostList from "./components/PostList";
 import PostForm from "./components/UI/PostForm";
 import MySelect from "./components/UI/select/MySelect";
@@ -6,28 +6,29 @@ import MyInput from "./components/UI/input/MyInput";
 import PostFilter from "./components/PostFilter";
 import MyModal from "./components/MyModal/MyModal";
 import MyButton from "./components/UI/button/MyButton";
+import {usePosts} from "./hooks/usePosts";
+import axios from "axios";
+import PostService from "./API/PostService";
 
 function App() {
-    const [posts, setPosts] = useState([
-        {id: 1, title: 'JavaScript', body: 'AAAA'},
-        {id: 2, title: 'React', body: 'SSSSS'},
-        {id: 3, title: 'Redux', body: 'DDDD'}
-    ])
+    const [posts, setPosts] = useState([])
 
     const [filter, setFilter] = useState({sort: '', query: ''})
     const [visible, setVisible] = useState(false)
+    const sortedAndSearchedPosts = usePosts(posts, filter.sort, filter.query)
+    const [isPostLoading, setIsPostLoading] = useState(false)
+
+    useEffect(() => {
+        fetchPost()
+    },[])
 
 
-    const sortedPost = useMemo(() => {
-        console.log("Отрабатала")
-        if (filter.sort) {
-            return [...posts.sort((a, b) => a[filter.sort].localeCompare(b[filter.sort]))]
-        } else return posts;
-    }, [filter.sort, posts])
-
-    const sortedAndSearchedPosts = useMemo(() => {
-        return sortedPost.filter(post => post.title.toLowerCase().includes(filter.query.toLowerCase()))
-    }, [filter.query, sortedPost])
+    async function fetchPost() {
+        setIsPostLoading(true)
+        const posts = await PostService.getAll()
+        setPosts(posts)
+        setIsPostLoading(false)
+    }
 
     const create = (newPost) => {
         setPosts([...posts, newPost])
@@ -40,6 +41,7 @@ function App() {
 
     return (
         <div className="App">
+            <button onClick={fetchPost}>Получить данные</button>
             <MyButton
                 style={{marginTop: '20px'}}
                  onClick={() => setVisible(true)}
@@ -50,7 +52,10 @@ function App() {
 
             <hr style={{margin: '15px 0'}}/>
             <PostFilter filter={filter} setFilter={setFilter}/>
-            <PostList removePost={removePost} post={sortedAndSearchedPosts} title={'Список постов'}/>
+            {isPostLoading
+            ? <h1>Идет загрузка....</h1>
+            : <PostList removePost={removePost} post={sortedAndSearchedPosts} title={'Список постов'}/>}
+
 
 
         </div>
