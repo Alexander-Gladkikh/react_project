@@ -24,6 +24,10 @@
   align-items: center;
 }
 
+. post__button {
+  display: flex;
+}
+
 .post-enter {
   opacity: 0;
 }
