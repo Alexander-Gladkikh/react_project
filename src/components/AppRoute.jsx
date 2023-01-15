@@ -6,9 +6,14 @@ import Error from "../pages/Error";
 import PostIdPage from "./PostIdPage";
 import {privateRoutes, publicRoutes} from "../routers/routers";
 import {AuthContext} from "../context/AuthContext";
+import Loader from "./UI/Loader/Loader";
 
 const AppRoute = () => {
-    const {isAuth, setIsAuth} = useContext(AuthContext)
+    const {isAuth, isLoading} = useContext(AuthContext)
+
+    if (isLoading) {
+        return <Loader/>
+    }
     return (
         isAuth
             ?
